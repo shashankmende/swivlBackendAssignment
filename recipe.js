@@ -10,8 +10,9 @@ class Recipe {
         console.log("result from add recipe",result)
         if (result === undefined){
         const query = `insert into recipe(title,description,ingredients,instructions,user_id) values('${title}','${description}','${ingredients}','${instructions}',${user_id})`
-        await db.run(query)
-        res.status(201).send("Recipe added successfully")
+       const insertResult =  await db.run(query)
+       const {lastID} = insertResult
+        res.status(201).send(`Recipe added successfully , id=${lastID}`)
     }
     else{
         res.status(400).send("Recipe with the given title already exist")
@@ -72,5 +73,6 @@ catch(e){
 }
 
 }
+
 }
 module.exports = Recipe
