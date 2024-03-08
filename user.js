@@ -57,7 +57,7 @@ class User {
 
 async register(req,res,db){
 
-
+try{
 
     const { username, password ,email} = req.body;
     console.log("request boyd",req.body)
@@ -76,17 +76,23 @@ console.log('result from register',result)
         };
 
         const query = `INSERT INTO user( username, password, image,email) VALUES ( ?, ?,?, ?)`;
-    await db.run(query, [newUser.username, newUser.password, newUser.image,newUser.email]);
-        console.log('last Id',this)
-        res.status(201).send("Registration Successful");
+    const insertResult = await db.run(query, [newUser.username, newUser.password, newUser.image,newUser.email]);
+        console.log('last Id',insertResult)
+        const {lastID} = insertResult
+        res.status(201).send(`Registration Successful ,id=${lastID}`);
     }
     else{
         
          res.status(409).send('User already exists');
     }
 }
+catch(e){
+    console.log("Error occured in register method")
+}
+}
 
-async specificUser(req,res,db){
+async profileManagement(req,res,db){
+    try{
     const {id} = req.params
     const query = `select * from user where id=${id}`
     const user = await db.get(query)
@@ -97,7 +103,53 @@ async specificUser(req,res,db){
         res.send("User not found . Try Again")
     }
 }
+    catch(e){
+        console.log("Error occured in user class Profile management")
+    }
+}
 
+async updateProfile(req,res,db){
+    try{
+    const {id} = req.params
+    const query=`select * from user where id=${id}`;
+
+    const result = await db.get(query)
+    if (result !== undefined){
+    const {username,password,email,image} = req.body
+    const updateQuery = `update user set username='${username}', password='${password}', email='${email}' , image='${image}' `
+    await db.run(updateQuery)
+    res.send("User profile updated Successfully")
+    }
+    else{
+        res.send("User with given Id is not found to update profile")
+    }
+}
+catch(e){
+    console.log("Error occured in updating user profile")
+    console.log(e)
+}
+}
+
+async UserDelete(req,res,db){
+    try{
+    const {id}=req.params
+    const query=`delete from user where id=${id}`
+    const dleteRest = await db.run(query)
+    console.log('delete result',dleteRest)
+    const {changes} = dleteRest
+    console.log('changes',changes)
+    if (changes === 1){
+        res.send("User Deleted Successfully")
+    }
+    else{
+        res.send("User not found to delete")
+    }
+
+}
+catch(e){
+    console.log("Error occured in deleting user")
+}
+}
 
 
 

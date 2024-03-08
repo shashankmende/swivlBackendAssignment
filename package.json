@@ -1,28 +1,45 @@
+
 {
   "name": "swivlassgn",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    
-    
-      "start": "node index.js",
-      
-    "dev": "nodemon index.js"
- 
-    
+    "start": "node index.js",  
+    "dev": "nodemon index.js"  
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "create-react-app": "^5.0.1",
     "express": "^4.18.3",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.7",
     "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"  
+  },
+  "engines": {
+    "node": ">=14.0.0"  
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

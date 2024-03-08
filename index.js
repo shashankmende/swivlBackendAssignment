@@ -35,7 +35,7 @@ const initializingDbAndServer = async () => {
 
       
 
-        app.listen(3000, () => {
+        app.listen(process.env.PORT || 3000, () => {
             console.log('Server is started at http://localhost:3000');
         });
     } catch (e) {
@@ -51,6 +51,7 @@ initializingDbAndServer()
 
 // Middleware for verifying the JWT token
 const verifyToken = (req, res, next) => {
+    try{
     const token = req.headers['authorization'].split(' ')[1]// Extracting token from Authorization header
     console.log('token',token)
     if (token === undefined) {
@@ -67,10 +68,15 @@ const verifyToken = (req, res, next) => {
       req.user = decoded;
       next();
     });
+}
+catch(e){
+    console.log("Error occured in verifying token, please send jwt token for authentication",e)
+}
   };
 
 //user realted api's
 
+// Login
 app.post("/auth", async (req, res) => {
     try {
         await authorizationFunction.authorization(req, res,db);
@@ -107,6 +113,8 @@ app.post("/auth", async (req, res) => {
     }
 });
 
+//Register
+
 app.post('/register', async (req, res) => {
     try {
         await authorizationFunction.register(req,res,db)
@@ -116,9 +124,10 @@ app.post('/register', async (req, res) => {
     }
 });
 
+//specific user
 app.get('/userProfile/:id', verifyToken,async (req,res)=>{
     try{
-        await authorizationFunction.specificUser(req,res,db)
+        await authorizationFunction.profileManagement(req,res,db)
     }
     catch(e){
         console.log("Error occured",e)
@@ -126,9 +135,34 @@ app.get('/userProfile/:id', verifyToken,async (req,res)=>{
     }
 })
 
+//update user details
+
+app.put('/updateProfile/:id',verifyToken,async (req,res)=>{
+    try{
+        await authorizationFunction.updateProfile(req,res,db)
+    }
+    catch(e){
+        console.log("Failed to make request on server")
+        console.log(e)
+    }
+})
+
+//Delete user
+app.delete('/deleteUser/:id',verifyToken,async(req,res)=>{
+    try{
+        await authorizationFunction.UserDelete(req,res,db)
+    }
+    catch(e){
+        console.log("Failed to make request to delete user")
+        console.log(e)
+    }
+})
+
+
 
 //recipe related api's
 
+//creating Recipe
 app.post('/newRecipe',verifyToken,async (req,res)=>{
     try{
         await RecipeInstance.addRecipe(req,res,db2)
@@ -138,7 +172,8 @@ app.post('/newRecipe',verifyToken,async (req,res)=>{
     }
 })
 
-app.get('/recipe/:id',async(req,res)=>{
+//Retrieving Recipe
+app.get('/recipe/:id',verifyToken,async(req,res)=>{
     try{
         await RecipeInstance.getRecipe(req,res,db2)
        
@@ -148,8 +183,9 @@ app.get('/recipe/:id',async(req,res)=>{
     }
 })
 
+//Update Recipe
 
-app.put('/recipeUpdate/:id',async(req,res)=>{
+app.put('/recipeUpdate/:id',verifyToken,async(req,res)=>{
     try{
         await RecipeInstance.updateRecipe(req,res,db2)
     }
@@ -159,8 +195,8 @@ app.put('/recipeUpdate/:id',async(req,res)=>{
 
 })
 
-
-app.delete('/recipeDelete/:id',async(req,res)=>{
+//Delete Recipe
+app.delete('/recipeDelete/:id',verifyToken,async(req,res)=>{
     try{
         await RecipeInstance.DeleteRecipe(req,res,db2)
 
